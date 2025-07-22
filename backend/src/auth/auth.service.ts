@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -14,7 +14,7 @@ export interface JwtPayload {
 
 export interface AuthResponse {
   user: {
-    id: string;
+    _id: string;
     email: string;
     name: string;
   };
@@ -25,6 +25,8 @@ export interface AuthResponse {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -32,18 +34,39 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmailWithPassword(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user.toObject();
+    this.logger.debug(`Validating user: ${email}`);
+    try {
+      const user = await this.usersService.findByEmailWithPassword(email);
+      if (!user) {
+        this.logger.warn(`User not found: ${email}`);
+        return null;
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        this.logger.warn(`Invalid password for user: ${email}`);
+        return null;
+      }
+
+      const { password: _, ...result } = user.toObject();
+      this.logger.debug(`User validated successfully: ${email}`);
       return result;
+    } catch (error) {
+      this.logger.error(`Error validating user ${email}: ${error.message}`, error.stack);
+      throw error;
     }
-    return null;
   }
 
   async validateUserById(id: string): Promise<UserDocument | null> {
+    this.logger.debug(`Validating user by ID: ${id}`);
     try {
-      return await this.usersService.findById(id);
+      const user = await this.usersService.findById(id);
+      if (!user) {
+        this.logger.warn(`User not found by ID: ${id}`);
+      }
+      return user;
     } catch (error) {
+      this.logger.error(`Error validating user by ID ${id}: ${error.message}`, error.stack);
       return null;
     }
   }
@@ -74,7 +97,7 @@ export class AuthService {
 
     return {
       user: {
-        id: user._id.toString(),
+        _id: user._id.toString(),
         email: user.email,
         name: user.name,
       },
