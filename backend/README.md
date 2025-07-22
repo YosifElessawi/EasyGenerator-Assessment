@@ -1,98 +1,193 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Backend API
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+NestJS backend with MongoDB for the GoPartners Assessment application. This backend provides authentication and user management APIs.
 
-## Description
+## 🚀 Getting Started
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Prerequisites
 
-## Project setup
+- Node.js (v18 or later)
+- npm (v9 or later)
+- MongoDB (v6.0 or later) or Docker (for local development)
+
+### Environment Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Update the `.env` file with your configuration:
+   ```env
+   # Server
+   PORT=3000
+   NODE_ENV=development
+
+   # MongoDB (choose one option below)
+   
+   # Option 1: Local MongoDB
+   MONGODB_URI=mongodb://localhost:27017/gopartners
+   
+   # Option 2: MongoDB Atlas (uncomment and update with your connection string)
+   # MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/gopartners?retryWrites=true&w=majority
+
+   # JWT
+   JWT_SECRET=your_jwt_secret_key_here
+   JWT_EXPIRES_IN=1d
+
+   # CORS
+   FRONTEND_URL=http://localhost:5173
+   ```
+
+### 🐳 Local Development with Docker (Recommended)
+
+1. Start MongoDB using Docker:
+   ```bash
+   docker run --name mongo -p 27017:27017 -d mongo:latest
+   ```
+
+
+### Installation
+
+1. Install dependencies:
+   
+
+
+### Running the App
 
 ```bash
+#Installation
 $ npm install
-```
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
+# Development
 $ npm run start:dev
 
-# production mode
+# Production build
+$ npm run build
 $ npm run start:prod
 ```
 
-## Run tests
+## 🧪 Testing
 
 ```bash
-# unit tests
+# Unit tests
 $ npm run test
 
-# e2e tests
+# E2E tests
 $ npm run test:e2e
 
-# test coverage
+# Test coverage
 $ npm run test:cov
 ```
 
-## Deployment
+## 📚 API Documentation
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Authentication
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+#### Register a new user
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```http
+POST /auth/signup
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**Request body:**
+```json
+{
+  "name": "John Doe",
+  "email": "user@example.com",
+  "password": "yourpassword123"
+}
+```
 
-## Resources
+**Success Response (201):**
+```json
+{
+  "user": {
+    "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
+    "email": "user@example.com",
+    "name": "John Doe"
+  },
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": "1d"
+}
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+#### Login
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```http
+POST /auth/signin
+```
 
-## Support
+**Request body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "yourpassword123"
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Success Response (200):**
+```json
+{
+  "user": {
+    "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
+    "email": "user@example.com",
+    "name": "John Doe"
+  },
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": "1d"
+}
+```
 
-## Stay in touch
+### User Profile
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+#### Get user profile (Protected)
 
-## License
+```http
+GET /auth/profile
+Authorization: Bearer <token>
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**Success Response (200):**
+```json
+{
+    "_id": "687fe3eefccd5e414479db48",
+    "email": "test@example.com",
+    "name": "Joe",
+    "createdAt": "2025-07-22T19:18:06.050Z",
+    "updatedAt": "2025-07-22T19:18:06.050Z"
+}
+```
+
+#### Logout (Protected)
+
+```http
+POST /auth/logout
+Authorization: Bearer <token>
+```
+
+**Success Response (200):**
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+## 🔧 Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Port the server will run on | `3000` |
+| `NODE_ENV` | Application environment | `development` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/gopartners` |
+| `JWT_SECRET` | Secret key for JWT signing | - |
+| `JWT_EXPIRES_IN` | JWT expiration time | `1d` |
+| `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:5173` |
+
+
+## 📝 License
+
+This project is [MIT licensed](LICENSE).
