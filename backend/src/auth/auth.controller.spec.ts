@@ -142,28 +142,4 @@ describe('AuthController', () => {
       );
     });
   });
-
-  describe('getProfile', () => {
-    it('should return user profile', async () => {
-      const mockUserId = new Types.ObjectId();
-      const req = { user: { _id: mockUserId } };
-      const result = await controller.getProfile(req as any);
-      
-      expect(result).toEqual(mockUser);
-      expect(authService.getProfile).toHaveBeenCalledWith(mockUserId.toString());
-    });
-
-    it('should throw UnauthorizedException when user is not found', async () => {
-      const mockUserId = new Types.ObjectId();
-      const req = { user: { _id: mockUserId } };
-      
-      jest.spyOn(authService, 'getProfile').mockRejectedValueOnce(
-        new Error('User not found'),
-      );
-      
-      await expect(controller.getProfile(req as any)).rejects.toThrow(
-        'User not found',
-      );
-    });
-  });
 });

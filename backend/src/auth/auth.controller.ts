@@ -22,12 +22,10 @@ export class AuthController {
   @Post('signin')
   async signin(@Req() req: RequestWithUser, @Body() signinDto: SigninDto) {
     this.logger.debug(`Signin attempt for email: ${signinDto.email}`);
-    
     if (!req.user) {
-      this.logger.warn(`Failed signin attempt for email: ${signinDto.email}`);
+      this.logger.warn('Authentication failed: User not found');
       throw new UnauthorizedException('Authentication failed');
     }
-    
     this.logger.log(`User ${req.user._id} signed in successfully`);
     return this.authService.generateAuthResponse(req.user);
   }
@@ -35,30 +33,9 @@ export class AuthController {
   @Post('signup')
   async signup(@Body() signupDto: CreateUserDto) {
     this.logger.debug(`Signup attempt for email: ${signupDto.email}`);
-    try {
-      const user = await this.authService.signup(signupDto);
-      this.logger.log(`User ${user.user._id} registered successfully`);
-      return user;
-    } catch (error) {
-      this.logger.error(`Signup failed for email ${signupDto.email}: ${error.message}`, error.stack);
-      throw error;
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  async getProfile(@Req() req: RequestWithUser) {
-    const userId = req.user._id.toString();
-    this.logger.debug(`Profile request for user: ${userId}`);
-    
-    try {
-      const profile = await this.authService.getProfile(userId);
-      this.logger.verbose(`Profile retrieved for user: ${userId}`);
-      return profile;
-    } catch (error) {
-      this.logger.error(`Failed to get profile for user ${userId}: ${error.message}`, error.stack);
-      throw error;
-    }
+    const user = await this.authService.signup(signupDto);
+    this.logger.log(`User ${user.user._id} registered successfully`);
+    return user;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -67,12 +44,9 @@ export class AuthController {
   async logout(@Req() req: RequestWithUser) {
     const userId = req.user._id;
     this.logger.log(`User ${userId} is logging out`);
-  
-    const response = {
+    this.logger.log(`User ${userId} logged out successfully`);
+    return {
       message: 'Logged out successfully',
     };
-    
-    this.logger.log(`User ${userId} logged out successfully`);
-    return response;
   }
 }
