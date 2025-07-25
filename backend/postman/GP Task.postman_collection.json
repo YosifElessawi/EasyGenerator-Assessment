@@ -1,0 +1,314 @@
+{
+	"info": {
+		"_postman_id": "0f2bdaec-8609-4316-b96d-f4649f90949f",
+		"name": "GP Task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38362244"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Joe\", \n    \"email\": \"test@example.com\", \n    \"password\": \"pass@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/signup",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@ex.com\", \n    \"password\": \"password@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODgwNDgyMmRiNmE2NzEwZDNmZDkzNzciLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJuYW1lIjoiSm9lIiwiaWF0IjoxNzUzMjM3NjI4LCJleHAiOjE3NTMzMjQwMjh9.M9is-l-pm3xXZ02Hpnus9EEZgHZ9T6fJdfXYIPft16U",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\",\n  \"script\": \"console.log('Hello, World!');\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/logout",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "get user profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODgwNDgyMmRiNmE2NzEwZDNmZDkzNzciLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJuYW1lIjoiSm9lIiwiaWF0IjoxNzUzNDExMjA4LCJleHAiOjE3NTM0OTc2MDh9.1S1LZm2oh2mXS9-xrTljqEuDGj9dMBF9beJS6DAC3Hk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/users/profile",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Joe\", \n    \"email\": \"test@example.com\", \n    \"password\": \"pass@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/signup",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODgwNDgyMmRiNmE2NzEwZDNmZDkzNzciLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJuYW1lIjoiSm9lIiwiaWF0IjoxNzUzNDExMjA4LCJleHAiOjE3NTM0OTc2MDh9.1S1LZm2oh2mXS9-xrTljqEuDGj9dMBF9beJS6DAC3Hk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\",\n  \"script\": \"console.log('Hello, World!');\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/users/68804822db6a6710d3fd9377",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"68804822db6a6710d3fd9377"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all users",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODgwNDgyMmRiNmE2NzEwZDNmZDkzNzciLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJuYW1lIjoiSm9lIiwiaWF0IjoxNzUzNDExMjA4LCJleHAiOjE3NTM0OTc2MDh9.1S1LZm2oh2mXS9-xrTljqEuDGj9dMBF9beJS6DAC3Hk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/users",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODgwNDgyMmRiNmE2NzEwZDNmZDkzNzciLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJuYW1lIjoiSm9lIiwiaWF0IjoxNzUzNDExMjA4LCJleHAiOjE3NTM0OTc2MDh9.1S1LZm2oh2mXS9-xrTljqEuDGj9dMBF9beJS6DAC3Hk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"email\": \"test@exx.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/users/68804822db6a6710d3fd9377",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"68804822db6a6710d3fd9377"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete user",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "home",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"test@example.com\",\n  \"script\": \"console.log('Hello, World!');\"\n}"
+				},
+				"url": {
+					"raw": "{{baseURL}}/api",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:3000",
+			"type": "default"
+		}
+	]
+}
