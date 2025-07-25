@@ -11,13 +11,18 @@ NestJS backend with MongoDB for the GoPartners Assessment application. This back
 - npm (v9 or later)
 - MongoDB (v6.0 or later) or Docker (for local development)
 
-### 🐳 Local Development with Docker (Recommended)
+### DB Setup 
 
-1. Start MongoDB using Docker:
+#### Option 1: Local MongoDB with Docker
+1. Start a MongoDB container:
    ```bash
-   docker run --name mongo -p 27017:27017 -d mongo:latest
+   docker run --name my-mongo -p 27017:27017 -v mongo-data:/data/db -d mongo
    ```
 
+#### Option 2: MongoDB Atlas
+1. get connection string from MongoDB Atlas
+
+2. update `MONGODB_URI` in `.env`
 
 ### Running the App
 
@@ -43,7 +48,9 @@ Copy the example environment file:
 |----------|-------------|---------|
 | `PORT` | Port the server will run on | `3000` |
 | `NODE_ENV` | Application environment | `development` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/gopartners` |
+| `MONGODB_URI` | MongoDB connection string. Can be either:
+  - Local: `mongodb://localhost:27017/devDB`
+  - Atlas: `mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority` | `mongodb://localhost:27017/devDB` |
 | `JWT_SECRET` | Secret key for JWT signing | - |
 | `JWT_EXPIRES_IN` | JWT expiration time | `1d` |
 | `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:5173` |
