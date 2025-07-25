@@ -34,7 +34,6 @@ export class AuthController {
   async signup(@Body() signupDto: CreateUserDto) {
     this.logger.debug(`Signup attempt for email: ${signupDto.email}`);
     const user = await this.authService.signup(signupDto);
-    this.logger.log(`User ${user.user._id} registered successfully`);
     return user;
   }
 
