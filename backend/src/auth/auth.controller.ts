@@ -6,10 +6,11 @@ import { SigninDto } from './dto/signin.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserDocument } from '../users/schemas/user.schema';
+import { UserResponseDto } from '../users/dto/user-response.dto';
 
 
 interface RequestWithUser extends Request {
-  user: UserDocument;
+  user: UserResponseDto;
 }
 
 @Controller('auth')
@@ -26,15 +27,15 @@ export class AuthController {
       this.logger.warn('Authentication failed: User not found');
       throw new UnauthorizedException('Authentication failed');
     }
+    
     this.logger.log(`User ${req.user._id} signed in successfully`);
-    return this.authService.generateAuthResponse(req.user);
+    return await this.authService.generateAuthResponse(req.user);
   }
 
   @Post('signup')
   async signup(@Body() signupDto: CreateUserDto) {
     this.logger.debug(`Signup attempt for email: ${signupDto.email}`);
-    const user = await this.authService.signup(signupDto);
-    return user;
+    return this.authService.signup(signupDto);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -2,9 +2,10 @@ import { ConflictException, Injectable, UnauthorizedException, Logger } from '@n
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { UserDocument } from '../users/schemas/user.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
+import { UserResponseDto } from '../users/dto/user-response.dto';
 
 export interface JwtPayload {
   sub: string;
@@ -33,7 +34,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<UserResponseDto | null> {
     this.logger.debug(`Validating user: ${email}`);
     try {
       const user = await this.usersService.findByEmailWithPassword(email);
@@ -48,18 +49,22 @@ export class AuthService {
         return null;
       }
 
-      const { password: _, ...result } = user.toObject();
-      this.logger.debug(`User validated successfully: ${email}`);
-      return result;
+      // Convert to UserResponseDto
+      return {
+        _id: user._id.toString(),
+        email: user.email,
+        name: user.name,
+      };
     } catch (error) {
       this.logger.error(`Error validating user ${email}: ${error.message}`, error.stack);
       throw error;
     }
   }
 
-  async validateUserById(id: string): Promise<UserDocument | null> {
+  async validateUserById(id: string): Promise<UserResponseDto | null> {
     this.logger.debug(`Validating user by ID: ${id}`);
     try {
+      // This will return a UserResponseDto from the usersService
       const user = await this.usersService.findById(id);
       if (!user) {
         this.logger.warn(`User not found by ID: ${id}`);
@@ -71,9 +76,11 @@ export class AuthService {
     }
   }
 
-  async signup(signupDto: CreateUserDto): Promise<AuthResponse>  {
+  async signup(createUserDto: CreateUserDto): Promise<AuthResponse> {
+    this.logger.log(`Signup attempt for email: ${createUserDto.email}`);
     try {
-      const user = await this.usersService.create(signupDto);
+      const user = await this.usersService.create(createUserDto);
+      this.logger.log(`User ${user._id} signed up successfully`);
       return this.generateAuthResponse(user);
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -83,9 +90,10 @@ export class AuthService {
     }
   }
 
-  generateAuthResponse(user: UserDocument): AuthResponse {
+  async generateAuthResponse(user: UserResponseDto): Promise<AuthResponse> {
+    this.logger.debug(`Generating auth response for user: ${user._id}`);
     const payload: JwtPayload = {
-      sub: user._id.toString(),
+      sub: user._id,
       email: user.email,
       name: user.name,
     };
@@ -97,7 +105,7 @@ export class AuthService {
 
     return {
       user: {
-        _id: user._id.toString(),
+        _id: user._id,
         email: user.email,
         name: user.name,
       },

@@ -2,10 +2,12 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { plainToClass } from 'class-transformer';
 
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +19,7 @@ export class UsersService {
     this.logger.log('UsersService initialized');
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     this.logger.log(`Attempting to create user with email: ${createUserDto.email}`);
     try {
       const existingUser = await this.userModel.findOne({ email: createUserDto.email });
@@ -38,7 +40,11 @@ export class UsersService {
       
       const savedUser = await newUser.save();
       this.logger.log(`User created successfully with ID: ${savedUser._id}`);
-      return savedUser;
+      
+      // Convert to DTO and return
+      return plainToClass(UserResponseDto, savedUser.toObject(), {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       this.logger.error(`Failed to create user: ${error.message}`, error.stack);
       if (error instanceof ConflictException) {
@@ -48,29 +54,36 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<UserDocument[]> {
+  async findAll(): Promise<UserResponseDto[]> {
     this.logger.debug('Fetching all users');
     try {
-      const users = await this.userModel.find().select('-password').exec();
+      const users = await this.userModel.find().select('-password').lean().exec();
       this.logger.debug(`Found ${users.length} users`);
-      return users;
+      // Convert each user to DTO
+      return users.map(user => 
+        plainToClass(UserResponseDto, user, {
+          excludeExtraneousValues: true,
+        })
+      );
     } catch (error) {
       this.logger.error('Failed to fetch users', error.stack);
       throw error;
     }
   }
   
-  async findById(id: string): Promise<UserDocument> {
+  async findById(id: string): Promise<UserResponseDto> {
     this.logger.debug(`Looking up user by ID: ${id}`);
     try {
-      const user = await this.userModel.findById(id).select('-password').exec();
+      const user = await this.userModel.findById(id).select('-password').lean().exec();
       
       if (!user) {
         this.logger.warn(`User not found with ID: ${id}`);
         throw new NotFoundException('User not found');
       }
       
-      return user;
+      return plainToClass(UserResponseDto, user, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       this.logger.error(`Error finding user with ID: ${id}`, error.stack);
       throw error;
@@ -106,12 +119,13 @@ export class UsersService {
   }
 
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDocument> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
     this.logger.log(`Updating user with ID: ${id}`);
     try {
       const user = await this.userModel
         .findByIdAndUpdate(id, updateUserDto, { new: true })
         .select('-password')
+        .lean()
         .exec();
       
       if (!user) {
@@ -120,7 +134,9 @@ export class UsersService {
       }
       
       this.logger.log(`Successfully updated user with ID: ${id}`);
-      return user;
+      return plainToClass(UserResponseDto, user, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       this.logger.error(`Error updating user with ID: ${id}`, error.stack);
       throw error;
