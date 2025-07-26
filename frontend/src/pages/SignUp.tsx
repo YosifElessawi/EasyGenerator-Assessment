@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { signUp } from '@/services/auth';
 import type { RootState, AppDispatch } from '@/store/store';
-import { AuthForm, type SignUpFormData } from '@/components/forms/AuthForm';
+import { AuthForm } from '@/components/forms/AuthForm';
+import type { SignUpFormData } from '@/schemas/auth';
 
 const SignUp = () => {
   const dispatch = useDispatch<AppDispatch>();
