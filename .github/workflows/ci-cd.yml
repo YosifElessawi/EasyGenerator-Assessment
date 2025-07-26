@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  NODE_ENV: test
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  MONGODB_URI: ${{ secrets.MONGODB_URI || 'mongodb://localhost:27017/test' }}
+  PORT: 3000
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
@@ -34,7 +40,9 @@ jobs:
       working-directory: ./backend
       run: npm test
       env:
-        MONGODB_URI: mongodb://localhost:27017/test
+        MONGODB_URI: ${{ env.MONGODB_URI }}
+        JWT_SECRET: ${{ env.JWT_SECRET }}
+        NODE_ENV: ${{ env.NODE_ENV }}
     
     # Frontend
     - name: Install frontend dependencies
@@ -44,6 +52,8 @@ jobs:
     - name: Run frontend tests
       working-directory: ./frontend
       run: npm test
+      env:
+        NODE_ENV: test
     
     - name: Build frontend
       working-directory: ./frontend
