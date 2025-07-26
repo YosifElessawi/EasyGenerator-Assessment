@@ -3,6 +3,7 @@
 
 NestJS backend with MongoDB for the EasyGenerator Assessment application. This backend provides authentication and user management APIs.
 
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -48,6 +49,7 @@ Copy the example environment file:
 |----------|-------------|---------|
 | `PORT` | Port the server will run on | `3000` |
 | `NODE_ENV` | Application environment | `development` |
+| `FRONTEND_URL` | URL of the frontend application | `http://localhost:3001` |
 | `MONGODB_URI` | MongoDB connection string. Can be either:
   - Local: `mongodb://localhost:27017/devDB`
   - Atlas: `mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority` | `mongodb://localhost:27017/devDB` |
@@ -67,185 +69,82 @@ $ npm run test:e2e
 # Test coverage
 $ npm run test:cov
 ```
-
 ## 📚 API Documentation
+
+This project uses Swagger/OpenAPI for API documentation. The interactive API documentation is automatically generated from the codebase using decorators.
+
+### Accessing the API Documentation
+
+1. Start the development server:
+   ```bash
+   npm run start:dev
+   ```
+
+2. Open your browser and navigate to:
+   ```
+   http://localhost:3000/api/docs
+   ```
+
+### Documenting New Endpoints
+
+To document a new endpoint, use the following decorators in your controllers:
+
+```typescript
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Users')
+@Controller('users')
+export class UsersController {
+  @Get()
+  @ApiOperation({ 
+    summary: 'Get all users',
+    description: 'Retrieves a list of all users in the system.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Successfully retrieved users',
+    type: [UserResponseDto]
+  })
+  async findAll() {
+    return this.usersService.findAll();
+  }
+}
+```
+
+### Documenting DTOs
+
+Use decorators to document your DTOs:
+
+```typescript
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CreateUserDto {
+  @ApiProperty({
+    description: 'User email address',
+    example: 'user@example.com',
+    required: true,
+  })
+  email: string;
+
+  @ApiProperty({
+    description: 'User password (min 8 characters)',
+    minLength: 8,
+    example: 'securePassword123!',
+    required: true,
+  })
+  password: string;
+}
+```
 
 ### Authentication
 
-#### Register a new user
+The API uses JWT authentication. To test authenticated endpoints:
 
-```http
-POST /auth/signup
-```
+1. Use the `/auth/login` endpoint to get a token
+2. Click the "Authorize" button in the Swagger UI
+3. Enter your token in the format: `Bearer <your-jwt-token>`
 
-**Request body:**
-```json
-{
-  "name": "John Doe",
-  "email": "user@example.com",
-  "password": "yourpassword123"
-}
-```
 
-**Success Response (201):**
-```json
-{
-  "user": {
-    "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
-    "email": "user@example.com",
-    "name": "John Doe"
-  },
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "Bearer",
-  "expires_in": "1d"
-}
-```
-
-#### Login
-
-```http
-POST /auth/signin
-```
-
-**Request body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "yourpassword123"
-}
-```
-
-**Success Response (200):**
-```json
-{
-  "user": {
-    "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
-    "email": "user@example.com",
-    "name": "John Doe"
-  },
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "Bearer",
-  "expires_in": "1d"
-}
-```
-
-#### Logout (Protected)
-
-```http
-POST /auth/logout
-Authorization: Bearer <token>
-```
-
-**Success Response (200):**
-```json
-{
-  "message": "Logged out successfully"
-}
-```
-
-### Users
-
-#### Get All Users (Protected)
-
-```http
-GET /users
-Authorization: Bearer <token>
-```
-
-**Success Response (200):**
-```json
-[
-  {
-    "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
-    "name": "John Doe",
-    "email": "john@example.com"
-  },
-  {
-    "_id": "70f9e6b4a2c1d3e5f7g8h9i0",
-    "name": "Jane Smith",
-    "email": "jane@example.com"
-  }
-]
-```
-
-#### Get User Profile (Protected)
-
-```http
-GET /users/profile
-Authorization: Bearer <token>
-```
-
-**Success Response (200):**
-```json
-{
-  "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
-  "name": "John Doe",
-  "email": "john@example.com"
-}
-```
-
-#### Get User by ID (Protected)
-
-```http
-GET /users/:id
-Authorization: Bearer <token>
-```
-
-**Path Parameters:**
-- `id`: User ID
-
-**Success Response (200):**
-```json
-{
-  "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
-  "name": "John Doe",
-  "email": "john@example.com"
-}
-```
-
-#### Update User (Protected)
-
-```http
-PATCH /users/:id
-Authorization: Bearer <token>
-```
-
-**Path Parameters:**
-- `id`: User ID
-
-**Request body:**
-```json
-{
-  "name": "John Updated",
-  "email": "john.updated@example.com"
-}
-```
-
-**Success Response (200):**
-```json
-{
-  "_id": "60f8d5a9e6b3f1b9d8f7c6b5",
-  "name": "John Updated",
-  "email": "john.updated@example.com"
-}
-```
-
-#### Delete User (Protected)
-
-```http
-DELETE /users/:id
-Authorization: Bearer <token>
-```
-
-**Path Parameters:**
-- `id`: User ID
-
-**Success Response (200):**
-```json
-{
-  "message": "User deleted successfully"
-}
-```
 #### Postman Collection
 A Postman collection is available at [postman/GP Task.postman_collection.json](./postman/GP%20Task.postman_collection.json). Import this file into Postman to quickly test all available API endpoints with pre-configured requests.
 

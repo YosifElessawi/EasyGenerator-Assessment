@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 import { validationPipe } from './common/pipes/validation.pipe';
@@ -47,8 +48,26 @@ async function bootstrap() {
   // Apply global validation pipe
   app.useGlobalPipes(validationPipe);
 
+  // Swagger Configuration
+  const config = new DocumentBuilder()
+    .setTitle('EazyGenerator API')
+    .setDescription('API documentation for EazyGenerator')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'method',
+    },
+  });
+
   await app.listen(port);
   logger.log(`Application is running on: http://localhost:${port}`);
+  logger.log(`API Documentation available at: http://localhost:${port}/api/docs`);
 }
 
 bootstrap().catch((err) => {
