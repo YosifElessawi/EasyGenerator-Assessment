@@ -1,90 +1,66 @@
-// src/components/auth/AuthForm.tsx
+// src/components/forms/AuthForm.tsx
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, Check } from "lucide-react";
 import { useState } from "react";
+import type { 
+  AuthFormProps, 
+  SignInFormData, 
+  SignUpFormData,
+  SignInFormProps,
+  SignUpFormProps
+} from "@/schemas/auth";
+import { signInSchema, signUpSchema } from "@/schemas/auth";
+import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 
-
-
-// Base schema for both forms
-const baseSchema = z.object({
-  email: z.email("Invalid email address"),
-  password: z.string()
-  .min(8, "Password must be at least 8 characters")
-    .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).*$/, 
-      "Password must include at least one letter, one number, and one special character"
-    ),
-});
-
-// Sign in schema
-const signInSchema = baseSchema;
-
-// Sign up schema with additional fields and password confirmation
-const signUpSchema = baseSchema.extend({
-  name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name is too long"),
-  confirmPassword: z.string().min(8, "Please confirm your password"),
-}).refine(
-  (data) => data.password === data.confirmPassword,
-  {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  }
-);
-
-// Type definitions
-export type SignInFormData = z.infer<typeof signInSchema>;
-export type SignUpFormData = z.infer<typeof signUpSchema>;
-
-interface SignInFormProps {
-  type: "signin";
-  onSubmit: (values: SignInFormData) => void | Promise<void>;
-  isLoading?: boolean;
-  error?: string | null;
-  switchAuthType: () => void;
-}
-
-interface SignUpFormProps {
-  type: "signup";
-  onSubmit: (values: SignUpFormData) => void | Promise<void>;
-  isLoading?: boolean;
-  error?: string | null;
-  switchAuthType: () => void;
-}
-
-type AuthFormProps = SignInFormProps | SignUpFormProps;
-
-export function AuthForm({ type, onSubmit, isLoading = false, error, switchAuthType }: AuthFormProps) {
+export const AuthForm = (props: AuthFormProps) => {
+  const { type, isLoading = false, error, switchAuthType, onForgotPassword, termsOfServiceUrl, privacyPolicyUrl } = props;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
   const schema = type === "signup" ? signUpSchema : signInSchema;
   
-const form = useForm<SignInFormData | SignUpFormData>({
-  resolver: zodResolver(schema),
-  defaultValues: {
-    email: "",
-    password: "",
-    ...(type === "signup" ? { name: "", confirmPassword: "" } : {})
-  }
-});
+  const form = useForm<SignInFormData | SignUpFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      email: "",
+      password: "",
+      ...(type === "signup" ? { name: "", confirmPassword: "" } : {})
+    }
+  });
+
+  // Separate handlers for better type safety
+  const handleSignInSubmit = async (values: SignInFormData) => {
+    if (type === "signin") {
+      await (props as SignInFormProps).onSubmit(values);
+    }
+  };
+
+  const handleSignUpSubmit = async (values: SignUpFormData) => {
+    if (type === "signup") {
+      await (props as SignUpFormProps).onSubmit(values);
+    }
+  };
 
   const handleSubmit = async (values: SignInFormData | SignUpFormData) => {
     try {
       if (type === "signup") {
-        (onSubmit as (values: SignUpFormData) => void)(values as SignUpFormData);
+        await handleSignUpSubmit(values as SignUpFormData);
       } else {
-        (onSubmit as (values: SignInFormData) => void)(values as SignInFormData);
+        await handleSignInSubmit(values as SignInFormData);
       }
     } catch (err) {
       console.error("Form submission error:", err);
     }
   };
+
+  const passwordValue = form.watch("password") || "";
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -119,6 +95,7 @@ const form = useForm<SignInFormData | SignUpFormData>({
                       <Input 
                         placeholder="John Doe" 
                         disabled={isLoading}
+                        autoComplete="name"
                         {...field} 
                       />
                     </FormControl>
@@ -139,6 +116,7 @@ const form = useForm<SignInFormData | SignUpFormData>({
                       type="email" 
                       placeholder="john@example.com" 
                       disabled={isLoading}
+                      autoComplete="email"
                       {...field} 
                     />
                   </FormControl>
@@ -154,12 +132,13 @@ const form = useForm<SignInFormData | SignUpFormData>({
                 <FormItem>
                   <div className="flex items-center justify-between">
                     <FormLabel>Password</FormLabel>
-                    {type === "signin" && (
+                    {type === "signin" && onForgotPassword && (
                       <Button 
                         type="button" 
                         variant="link" 
                         className="px-0 h-auto text-sm"
                         disabled={isLoading}
+                        onClick={onForgotPassword}
                       >
                         Forgot password?
                       </Button>
@@ -171,7 +150,13 @@ const form = useForm<SignInFormData | SignUpFormData>({
                         type={showPassword ? "text" : "password"} 
                         placeholder="••••••••" 
                         disabled={isLoading}
-                        {...field} 
+                        autoComplete={type === "signin" ? "current-password" : "new-password"}
+                        {...field}
+                        onFocus={() => type === "signup" && setShowPasswordRequirements(true)}
+                        onBlur={() => {
+                          field.onBlur();
+                          setShowPasswordRequirements(false);
+                        }}
                       />
                       <Button
                         type="button"
@@ -180,6 +165,7 @@ const form = useForm<SignInFormData | SignUpFormData>({
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowPassword(!showPassword)}
                         disabled={isLoading}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -189,6 +175,9 @@ const form = useForm<SignInFormData | SignUpFormData>({
                       </Button>
                     </div>
                   </FormControl>
+                  {type === "signup" && (showPasswordRequirements || passwordValue) && (
+                    <PasswordRequirements password={passwordValue} />
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -207,6 +196,7 @@ const form = useForm<SignInFormData | SignUpFormData>({
                           type={showConfirmPassword ? "text" : "password"} 
                           placeholder="••••••••" 
                           disabled={isLoading}
+                          autoComplete="new-password"
                           {...field} 
                         />
                         <Button
@@ -216,6 +206,7 @@ const form = useForm<SignInFormData | SignUpFormData>({
                           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           disabled={isLoading}
+                          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
                         >
                           {showConfirmPassword ? (
                             <EyeOff className="h-4 w-4" />
@@ -225,6 +216,12 @@ const form = useForm<SignInFormData | SignUpFormData>({
                         </Button>
                       </div>
                     </FormControl>
+                    {field.value && passwordValue && field.value === passwordValue && (
+                      <div className="flex items-center gap-2 text-xs text-green-600 mt-1">
+                        <Check className="h-3 w-3" />
+                        <span>Passwords match</span>
+                      </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -263,13 +260,31 @@ const form = useForm<SignInFormData | SignUpFormData>({
         {type === "signup" && (
           <p className="text-xs text-muted-foreground text-center">
             By creating an account, you agree to our{" "}
-            <Button variant="link" className="px-0 h-auto text-xs">
-              Terms of Service
-            </Button>{" "}
-            and{" "}
-            <Button variant="link" className="px-0 h-auto text-xs">
-              Privacy Policy
-            </Button>
+            {termsOfServiceUrl ? (
+              <a 
+                href={termsOfServiceUrl} 
+                className="text-primary hover:underline"
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Terms of Service
+              </a>
+            ) : (
+              <span className="text-primary">Terms of Service</span>
+            )}
+            {" "}and{" "}
+            {privacyPolicyUrl ? (
+              <a 
+                href={privacyPolicyUrl} 
+                className="text-primary hover:underline"
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Privacy Policy
+              </a>
+            ) : (
+              <span className="text-primary">Privacy Policy</span>
+            )}
           </p>
         )}
       </CardFooter>
