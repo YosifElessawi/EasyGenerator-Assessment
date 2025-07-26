@@ -15,6 +15,7 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3000;
+  const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
   const frontendUrl = configService.get<string>('FRONTEND_URL');
 
   // Global Exception Filter
@@ -65,8 +66,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(port);
-  logger.log(`Application is running on: http://localhost:${port}`);
+  await app.listen(port, host);
+  logger.log(`Application is running on: http://${host}:${port}`);
   logger.log(`API Documentation available at: http://localhost:${port}/api/docs`);
 }
 
