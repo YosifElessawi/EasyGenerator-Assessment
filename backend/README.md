@@ -1,7 +1,7 @@
 
 # Backend API
 
-NestJS backend with MongoDB for the GoPartners Assessment application. This backend provides authentication and user management APIs.
+NestJS backend with MongoDB for the EasyGenerator Assessment application. This backend provides authentication and user management APIs.
 
 ## 🚀 Getting Started
 
