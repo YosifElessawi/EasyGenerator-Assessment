@@ -1,7 +1,7 @@
 
 # Backend API
 
-NestJS backend with MongoDB for the EasyGenerator Assessment application. This backend provides authentication and user management APIs.
+NestJS backend with MongoDB. This backend provides authentication and user management APIs.
 
 
 ## 🚀 Getting Started
@@ -50,9 +50,7 @@ Copy the example environment file:
 | `PORT` | Port the server will run on | `3000` |
 | `NODE_ENV` | Application environment | `development` |
 | `FRONTEND_URL` | URL of the frontend application | `http://localhost:3001` |
-| `MONGODB_URI` | MongoDB connection string. Can be either:
-  - Local: `mongodb://localhost:27017/devDB`
-  - Atlas: `mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority` | `mongodb://localhost:27017/devDB` |
+| `MONGODB_URI` | MongoDB connection string. | Local: `mongodb://localhost:27017/devDB` Atlas: `mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority` |
 | `JWT_SECRET` | Secret key for JWT signing | - |
 | `JWT_EXPIRES_IN` | JWT expiration time | `1d` |
 | `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:5173` |

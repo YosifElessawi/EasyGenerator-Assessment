@@ -1,16 +1,15 @@
 # EasyGenerator Assessment
 
-This is a full-stack application built with React 18 and NestJS 11. It includes user authentication module.
+This is a full-stack application built with React and NestJS. It includes user authentication module.
 
 ## Tech Stack
 
-- **Frontend**: React 18 with TypeScript and TailwindCSS
+- **Frontend**: React with TypeScript and TailwindCSS
 - **Backend**: NestJS with TypeScript
 - **Database**: MongoDB
 - **Authentication**: JWT
 - **State Management**: Redux 
 - **Testing**: Jest, Supertest
-
 
 
 ## Prerequisites
@@ -69,6 +68,25 @@ This is a full-stack application built with React 18 and NestJS 11. It includes 
    ```bash
    npm run start:dev
    ```
+
+
+## Areas Covered
+
+- **Full-stack Development**: Required pages for signup, signin, and app(protected route)
+- **API Endpoints**: Required api routes for signup, signin, and (protected endpoints)
+- **Security**: JWT-based authentication, password hashing and input validation 
+- **Testing**: Backend endpoints tests
+- **Error Handling**: Global filter for error handling
+- **Logging**: Global logger for logging backend process and exceptions
+- **CI/CD Pipeline**: Basic CI/CD pipeline using GitHub Actions
+- **Documentation**: Basic API documentation using Swagger
+
+## Areas for Improvement
+
+- **Testing Coverage**: Expand test coverage for frontend and backend
+- **Error Handling**: More comprehensive error handling and user feedback
+- **Security**: Use refresh tokens and blacklisting for logout
+- **Authentication**: Social authentication and password recovery
 
 
 ## License
