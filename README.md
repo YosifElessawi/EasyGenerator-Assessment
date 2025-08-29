@@ -1,4 +1,4 @@
-# Authentication full-stack project 
+# Authentication Full-Stack Project 
 
 This is a full-stack application built with React and NestJS. It includes user authentication module.
 
